@@ -54,6 +54,12 @@ def convert(currency1, currency2, amount):
     print(f"{amount} {currency1} is equal to {converted_amount} {currency2}")
     return converted_amount
 
+def show_help():
+    print("List - lists the different currencies")
+    print("Convert - convert from one currency to another")
+    print("Rate - get the exchange rate of two currencies")
+    print("q - quit")
+
 def main():
     currencies = get_currencies()
     
@@ -79,6 +85,8 @@ def main():
             currency1 = input("Enter a base currency: ").upper()
             currency2 = input("Enter a currency to convert to: ").upper()
             exchange_rate(currency1, currency2)
+        elif command == "help":
+            show_help()
         else:
             print("Unrecognised command!")
     
