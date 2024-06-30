@@ -1,9 +1,13 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 from requests import get
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_URL = "https://free.currconv.com/"
-API_KEY = "0e95030a9c5ba6cee694"
+API_KEY = os.getenv("API_KEY") 
 
 def get_currencies():
     endpoint = f"api/v7/currencies?apiKey={API_KEY}"
