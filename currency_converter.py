@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_URL = "https://free.currconv.com/"
-API_KEY = os.getenv("API_KEY") 
+API_KEY = os.getenv("API_KEY")
 
 def get_currencies():
     endpoint = f"api/v7/currencies?apiKey={API_KEY}"
@@ -42,7 +42,7 @@ def exchange_rate(currency1, currency2):
 def convert_currency():
     clear_output()
     currency1 = entry_currency1.get().upper()
-    amount = entry_amount.get()
+    amount = entry_amount.get().replace(" ", "")
     currency2 = entry_currency2.get().upper()
     
     rate = exchange_rate(currency1, currency2)
@@ -81,17 +81,14 @@ def show_help():
 def clear_output():
     output_text.delete(1.0, tk.END)
 
-
 root = tk.Tk()
 root.title("Currency Converter")
-
 
 style = ttk.Style()
 style.configure("TButton", padding=10, font=('Helvetica', 12))
 style.configure("TLabel", font=('Helvetica', 12))
 style.configure("TEntry", font=('Helvetica', 12))
 style.configure("TText", font=('Helvetica', 12))
-
 
 frame_input = ttk.Frame(root, padding=(20, 10))
 frame_input.pack()
@@ -133,6 +130,5 @@ output_text = tk.Text(frame_output, height=10, width=50, wrap=tk.WORD, yscrollco
 output_text.pack()
 
 scrollbar.config(command=output_text.yview)
-
 
 root.mainloop()

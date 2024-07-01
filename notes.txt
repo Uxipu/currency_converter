@@ -1,0 +1,13 @@
+currency converter
+
+1. Add color to buttons, background and add border to input fields
+
+2. add search feature
+
+3. hide text field and only display when listing currencies and getting a response back
+
+4. Add icon for app
+
+5. Do tests
+
+6. Add README file
