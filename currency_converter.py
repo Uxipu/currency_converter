@@ -72,11 +72,27 @@ def list_currencies():
         symbol = currency.get("currencySymbol", "")
         output_text.insert(tk.END, f"{_id} - {name} - {symbol}\n")
 
+def search_currency():
+    clear_output()
+    search_term = entry_search.get().lower()
+    currencies = get_currencies()
+    if not currencies:
+        output_text.insert(tk.END, "Failed to fetch currencies.\n")
+        return
+
+    for name, currency in currencies:
+        currency_name = currency['currencyName'].lower()
+        if search_term in currency_name:
+            _id = currency['id']
+            symbol = currency.get("currencySymbol", "")
+            output_text.insert(tk.END, f"{_id} - {currency['currencyName']} - {symbol}\n")
+
 def show_help():
     clear_output()
     output_text.insert(tk.END, "List = lists the different currencies\n")
     output_text.insert(tk.END, "Convert - convert from one currency to another\n")
     output_text.insert(tk.END, "Rate - get the exchange rate of two currencies\n")
+    output_text.insert(tk.END, "Search - search for a currency by name\n")
 
 def clear_output():
     output_text.delete(1.0, tk.END)
@@ -108,6 +124,11 @@ label_currency2.grid(row=2, column=0, padx=10, pady=5)
 entry_currency2 = ttk.Entry(frame_input, width=20)
 entry_currency2.grid(row=2, column=1, padx=10, pady=5)
 
+label_search = ttk.Label(frame_input, text="Search Currency:")
+label_search.grid(row=3, column=0, padx=10, pady=5)
+entry_search = ttk.Entry(frame_input, width=20)
+entry_search.grid(row=3, column=1, padx=10, pady=5)
+
 frame_buttons = ttk.Frame(root, padding=(20, 5))
 frame_buttons.pack()
 
@@ -116,6 +137,9 @@ button_convert.pack(side=tk.LEFT, padx=10)
 
 button_list = ttk.Button(frame_buttons, text="List Currencies", command=list_currencies)
 button_list.pack(side=tk.LEFT, padx=10)
+
+button_search = ttk.Button(frame_buttons, text="Search", command=search_currency)
+button_search.pack(side=tk.LEFT, padx=10)
 
 button_help = ttk.Button(frame_buttons, text="Help", command=show_help)
 button_help.pack(side=tk.LEFT, padx=10)
