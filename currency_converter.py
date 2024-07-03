@@ -12,28 +12,30 @@ API_KEY = os.getenv("API_KEY")
 def get_currencies():
     endpoint = f"api/v7/currencies?apiKey={API_KEY}"
     url = BASE_URL + endpoint
-    response = get(url)
-    
-    if response.status_code != 200:
+    try:
+        response = get(url)
+        response.raise_for_status()
+    except Exception as e:
+        output_text.insert(ttk.END, f"Error fetching currencies: {e}\n")
         return []
     
     data = response.json().get('results', {})
     data = list(data.items())
     data.sort()
-    
     return data
 
 def exchange_rate(currency1, currency2):
     endpoint = f"api/v7/convert?q={currency1}_{currency2}&compact=ultra&apiKey={API_KEY}"
     url = BASE_URL + endpoint
-    response = get(url)
-    
-    if response.status_code != 200:
+    try:
+        response = get(url)
+        response.raise_for_status()
+    except Exception as e:
+        output_text.insert(ttk.END, f"Error fetching exchange rate: {e}\n")
         return None
     
     data = response.json()
-    
-    if len(data) == 0:
+    if not data:
         return None
     
     rate = list(data.values())[0]
@@ -66,7 +68,7 @@ def list_currencies():
         output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
     
-    for name, currency in currencies:
+    for _, currency in currencies:
         name = currency['currencyName']
         _id = currency['id']
         symbol = currency.get("currencySymbol", "")
@@ -80,7 +82,7 @@ def search_currency():
         output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
 
-    for name, currency in currencies:
+    for _, currency in currencies:
         currency_name = currency['currencyName'].lower()
         if search_term in currency_name:
             _id = currency['id']
@@ -89,10 +91,13 @@ def search_currency():
 
 def show_help():
     clear_output()
-    output_text.insert(ttk.END, "List = lists the different currencies\n")
-    output_text.insert(ttk.END, "Convert - convert from one currency to another\n")
-    output_text.insert(ttk.END, "Rate - get the exchange rate of two currencies\n")
-    output_text.insert(ttk.END, "Search - search for a currency by name\n")
+    help_text = (
+        "List = lists the different currencies\n"
+        "Convert - convert from one currency to another and get the exchange rate\n"
+        "Search - search for a currency by name\n"
+        "Toggle Search - show/hide the search entry\n"
+    )
+    output_text.insert(ttk.END, help_text)
 
 def clear_output():
     output_text.delete(1.0, ttk.END)
@@ -105,9 +110,15 @@ def toggle_search_entry():
         label_search.grid()
         entry_search.grid()
 
+def clear_all():
+    entry_currency1.delete(0, ttk.END)
+    entry_amount.delete(0, ttk.END)
+    entry_currency2.delete(0, ttk.END)
+    entry_search.delete(0, ttk.END)
+    clear_output()
+
 root = Tk()
 root.title("Currency Converter")
-
 
 style = ttk.Style("darkly")
 
@@ -153,6 +164,9 @@ button_toggle_search.pack(side=ttk.LEFT, padx=10)
 
 button_help = ttk.Button(frame_buttons, text="Help", command=show_help)
 button_help.pack(side=ttk.LEFT, padx=10)
+
+button_clear = ttk.Button(frame_buttons, text="Clear", command=clear_all)
+button_clear.pack(side=ttk.LEFT, padx=10)
 
 frame_output = ttk.Frame(root, padding=(20, 10))
 frame_output.pack()
