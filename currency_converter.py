@@ -1,6 +1,6 @@
 import os
-import tkinter as tk
-from tkinter import ttk
+import ttkbootstrap as ttk
+from tkinter import Tk
 from requests import get
 from dotenv import load_dotenv
 
@@ -47,37 +47,37 @@ def convert_currency():
     
     rate = exchange_rate(currency1, currency2)
     if rate is None:
-        output_text.insert(tk.END, "Invalid currencies or failed to fetch exchange rate.\n")
+        output_text.insert(ttk.END, "Invalid currencies or failed to fetch exchange rate.\n")
         return
     
     try:
         amount = float(amount)
     except ValueError:
-        output_text.insert(tk.END, "Invalid amount.\n")
+        output_text.insert(ttk.END, "Invalid amount.\n")
         return
     
     converted_amount = rate * amount
-    output_text.insert(tk.END, f"{amount} {currency1} is equal to {converted_amount} {currency2}\n")
+    output_text.insert(ttk.END, f"{amount} {currency1} is equal to {converted_amount} {currency2}\n")
 
 def list_currencies():
     clear_output()
     currencies = get_currencies()
     if not currencies:
-        output_text.insert(tk.END, "Failed to fetch currencies.\n")
+        output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
     
     for name, currency in currencies:
         name = currency['currencyName']
         _id = currency['id']
         symbol = currency.get("currencySymbol", "")
-        output_text.insert(tk.END, f"{_id} - {name} - {symbol}\n")
+        output_text.insert(ttk.END, f"{_id} - {name} - {symbol}\n")
 
 def search_currency():
     clear_output()
     search_term = entry_search.get().lower()
     currencies = get_currencies()
     if not currencies:
-        output_text.insert(tk.END, "Failed to fetch currencies.\n")
+        output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
 
     for name, currency in currencies:
@@ -85,26 +85,31 @@ def search_currency():
         if search_term in currency_name:
             _id = currency['id']
             symbol = currency.get("currencySymbol", "")
-            output_text.insert(tk.END, f"{_id} - {currency['currencyName']} - {symbol}\n")
+            output_text.insert(ttk.END, f"{_id} - {currency['currencyName']} - {symbol}\n")
 
 def show_help():
     clear_output()
-    output_text.insert(tk.END, "List = lists the different currencies\n")
-    output_text.insert(tk.END, "Convert - convert from one currency to another\n")
-    output_text.insert(tk.END, "Rate - get the exchange rate of two currencies\n")
-    output_text.insert(tk.END, "Search - search for a currency by name\n")
+    output_text.insert(ttk.END, "List = lists the different currencies\n")
+    output_text.insert(ttk.END, "Convert - convert from one currency to another\n")
+    output_text.insert(ttk.END, "Rate - get the exchange rate of two currencies\n")
+    output_text.insert(ttk.END, "Search - search for a currency by name\n")
 
 def clear_output():
-    output_text.delete(1.0, tk.END)
+    output_text.delete(1.0, ttk.END)
 
-root = tk.Tk()
+def toggle_search_entry():
+    if entry_search.winfo_ismapped():
+        label_search.grid_remove()
+        entry_search.grid_remove()
+    else:
+        label_search.grid()
+        entry_search.grid()
+
+root = Tk()
 root.title("Currency Converter")
 
-style = ttk.Style()
-style.configure("TButton", padding=10, font=('Helvetica', 12))
-style.configure("TLabel", font=('Helvetica', 12))
-style.configure("TEntry", font=('Helvetica', 12))
-style.configure("TText", font=('Helvetica', 12))
+
+style = ttk.Style("darkly")
 
 frame_input = ttk.Frame(root, padding=(20, 10))
 frame_input.pack()
@@ -128,29 +133,34 @@ label_search = ttk.Label(frame_input, text="Search Currency:")
 label_search.grid(row=3, column=0, padx=10, pady=5)
 entry_search = ttk.Entry(frame_input, width=20)
 entry_search.grid(row=3, column=1, padx=10, pady=5)
+label_search.grid_remove()
+entry_search.grid_remove()
 
 frame_buttons = ttk.Frame(root, padding=(20, 5))
 frame_buttons.pack()
 
 button_convert = ttk.Button(frame_buttons, text="Convert", command=convert_currency)
-button_convert.pack(side=tk.LEFT, padx=10)
+button_convert.pack(side=ttk.LEFT, padx=10)
 
 button_list = ttk.Button(frame_buttons, text="List Currencies", command=list_currencies)
-button_list.pack(side=tk.LEFT, padx=10)
+button_list.pack(side=ttk.LEFT, padx=10)
 
 button_search = ttk.Button(frame_buttons, text="Search", command=search_currency)
-button_search.pack(side=tk.LEFT, padx=10)
+button_search.pack(side=ttk.LEFT, padx=10)
+
+button_toggle_search = ttk.Button(frame_buttons, text="Toggle Search", command=toggle_search_entry)
+button_toggle_search.pack(side=ttk.LEFT, padx=10)
 
 button_help = ttk.Button(frame_buttons, text="Help", command=show_help)
-button_help.pack(side=tk.LEFT, padx=10)
+button_help.pack(side=ttk.LEFT, padx=10)
 
 frame_output = ttk.Frame(root, padding=(20, 10))
 frame_output.pack()
 
 scrollbar = ttk.Scrollbar(frame_output)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+scrollbar.pack(side=ttk.RIGHT, fill=ttk.Y)
 
-output_text = tk.Text(frame_output, height=10, width=50, wrap=tk.WORD, yscrollcommand=scrollbar.set)
+output_text = ttk.Text(frame_output, height=10, width=50, wrap=ttk.WORD, yscrollcommand=scrollbar.set)
 output_text.pack()
 
 scrollbar.config(command=output_text.yview)
