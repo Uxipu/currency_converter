@@ -4,12 +4,15 @@ from tkinter import Tk
 from requests import get
 from dotenv import load_dotenv
 
+#load environment variables
 load_dotenv()
 
+#API configuration
 BASE_URL = "https://free.currconv.com/"
 API_KEY = os.getenv("API_KEY")
 
 def get_currencies():
+    "Fetch the list of currencies from the API"
     endpoint = f"api/v7/currencies?apiKey={API_KEY}"
     url = BASE_URL + endpoint
     try:
@@ -25,6 +28,7 @@ def get_currencies():
     return data
 
 def exchange_rate(currency1, currency2):
+    "Fetch the exchange rate between two currencies"
     endpoint = f"api/v7/convert?q={currency1}_{currency2}&compact=ultra&apiKey={API_KEY}"
     url = BASE_URL + endpoint
     try:
@@ -42,6 +46,7 @@ def exchange_rate(currency1, currency2):
     return rate
 
 def convert_currency():
+    "Convert amount from one currency to another"
     clear_output()
     currency1 = entry_currency1.get().upper()
     amount = entry_amount.get().replace(" ", "")
@@ -62,6 +67,7 @@ def convert_currency():
     output_text.insert(ttk.END, f"{amount} {currency1} is equal to {converted_amount} {currency2}\n")
 
 def list_currencies():
+    "List all available currencies"
     clear_output()
     currencies = get_currencies()
     if not currencies:
@@ -75,6 +81,7 @@ def list_currencies():
         output_text.insert(ttk.END, f"{_id} - {name} - {symbol}\n")
 
 def search_currency():
+    "Search for a currency by name"
     clear_output()
     search_term = entry_search.get().lower()
     currencies = get_currencies()
@@ -90,6 +97,7 @@ def search_currency():
             output_text.insert(ttk.END, f"{_id} - {currency['currencyName']} - {symbol}\n")
 
 def show_help():
+    "Display help information"
     clear_output()
     help_text = (
         "List = lists the different currencies\n"
@@ -100,9 +108,11 @@ def show_help():
     output_text.insert(ttk.END, help_text)
 
 def clear_output():
+    "Ckear the output text widget"
     output_text.delete(1.0, ttk.END)
 
 def toggle_search_entry():
+    "Toggle the visisbility of the search entry field"
     if entry_search.winfo_ismapped():
         label_search.grid_remove()
         entry_search.grid_remove()
@@ -111,12 +121,14 @@ def toggle_search_entry():
         entry_search.grid()
 
 def clear_all():
+    "Clear all input fields and output text"
     entry_currency1.delete(0, ttk.END)
     entry_amount.delete(0, ttk.END)
     entry_currency2.delete(0, ttk.END)
     entry_search.delete(0, ttk.END)
     clear_output()
 
+#Main GUI setup
 root = Tk()
 root.title("Currency Converter")
 
@@ -125,6 +137,7 @@ style = ttk.Style("darkly")
 frame_input = ttk.Frame(root, padding=(20, 10))
 frame_input.pack()
 
+#Input fields
 label_currency1 = ttk.Label(frame_input, text="Base Currency:")
 label_currency1.grid(row=0, column=0, padx=10, pady=5)
 entry_currency1 = ttk.Entry(frame_input, width=20)
@@ -150,6 +163,7 @@ entry_search.grid_remove()
 frame_buttons = ttk.Frame(root, padding=(20, 5))
 frame_buttons.pack()
 
+#Buttons
 button_convert = ttk.Button(frame_buttons, text="Convert", command=convert_currency)
 button_convert.pack(side=ttk.LEFT, padx=10)
 
@@ -171,6 +185,7 @@ button_clear.pack(side=ttk.LEFT, padx=10)
 frame_output = ttk.Frame(root, padding=(20, 10))
 frame_output.pack()
 
+#Output text and scrollbar
 scrollbar = ttk.Scrollbar(frame_output)
 scrollbar.pack(side=ttk.RIGHT, fill=ttk.Y)
 
