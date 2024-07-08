@@ -4,14 +4,14 @@ from tkinter import Tk
 from requests import get
 from dotenv import load_dotenv
 
-#load environment variables
+# Load environment variables
 load_dotenv()
 
-#API configuration
+# API configuration
 BASE_URL = "https://free.currconv.com/"
 API_KEY = os.getenv("API_KEY")
 
-def get_currencies():
+def get_currencies(output=None):
     "Fetch the list of currencies from the API"
     endpoint = f"api/v7/currencies?apiKey={API_KEY}"
     url = BASE_URL + endpoint
@@ -19,7 +19,8 @@ def get_currencies():
         response = get(url)
         response.raise_for_status()
     except Exception as e:
-        output_text.insert(ttk.END, f"Error fetching currencies: {e}\n")
+        if output:
+            output.insert(ttk.END, f"Error fetching currencies: {e}\n")
         return []
     
     data = response.json().get('results', {})
@@ -27,7 +28,7 @@ def get_currencies():
     data.sort()
     return data
 
-def exchange_rate(currency1, currency2):
+def exchange_rate(currency1, currency2, output=None):
     "Fetch the exchange rate between two currencies"
     endpoint = f"api/v7/convert?q={currency1}_{currency2}&compact=ultra&apiKey={API_KEY}"
     url = BASE_URL + endpoint
@@ -35,7 +36,8 @@ def exchange_rate(currency1, currency2):
         response = get(url)
         response.raise_for_status()
     except Exception as e:
-        output_text.insert(ttk.END, f"Error fetching exchange rate: {e}\n")
+        if output:
+            output.insert(ttk.END, f"Error fetching exchange rate: {e}\n")
         return None
     
     data = response.json()
@@ -52,7 +54,7 @@ def convert_currency():
     amount = entry_amount.get().replace(" ", "")
     currency2 = entry_currency2.get().upper()
     
-    rate = exchange_rate(currency1, currency2)
+    rate = exchange_rate(currency1, currency2, output=output_text)
     if rate is None:
         output_text.insert(ttk.END, "Invalid currencies or failed to fetch exchange rate.\n")
         return
@@ -69,7 +71,7 @@ def convert_currency():
 def list_currencies():
     "List all available currencies"
     clear_output()
-    currencies = get_currencies()
+    currencies = get_currencies(output=output_text)
     if not currencies:
         output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
@@ -84,7 +86,7 @@ def search_currency():
     "Search for a currency by name"
     clear_output()
     search_term = entry_search.get().lower()
-    currencies = get_currencies()
+    currencies = get_currencies(output=output_text)
     if not currencies:
         output_text.insert(ttk.END, "Failed to fetch currencies.\n")
         return
@@ -108,11 +110,11 @@ def show_help():
     output_text.insert(ttk.END, help_text)
 
 def clear_output():
-    "Ckear the output text widget"
+    "Clear the output text widget"
     output_text.delete(1.0, ttk.END)
 
 def toggle_search_entry():
-    "Toggle the visisbility of the search entry field"
+    "Toggle the visibility of the search entry field"
     if entry_search.winfo_ismapped():
         label_search.grid_remove()
         entry_search.grid_remove()
@@ -128,7 +130,7 @@ def clear_all():
     entry_search.delete(0, ttk.END)
     clear_output()
 
-#Main GUI setup
+# Main GUI setup
 root = Tk()
 root.title("Currency Converter")
 
@@ -137,7 +139,7 @@ style = ttk.Style("darkly")
 frame_input = ttk.Frame(root, padding=(20, 10))
 frame_input.pack()
 
-#Input fields
+# Input fields
 label_currency1 = ttk.Label(frame_input, text="Base Currency:")
 label_currency1.grid(row=0, column=0, padx=10, pady=5)
 entry_currency1 = ttk.Entry(frame_input, width=20)
@@ -163,7 +165,7 @@ entry_search.grid_remove()
 frame_buttons = ttk.Frame(root, padding=(20, 5))
 frame_buttons.pack()
 
-#Buttons
+# Buttons
 button_convert = ttk.Button(frame_buttons, text="Convert", command=convert_currency)
 button_convert.pack(side=ttk.LEFT, padx=10)
 
@@ -185,7 +187,7 @@ button_clear.pack(side=ttk.LEFT, padx=10)
 frame_output = ttk.Frame(root, padding=(20, 10))
 frame_output.pack()
 
-#Output text and scrollbar
+# Output text and scrollbar
 scrollbar = ttk.Scrollbar(frame_output)
 scrollbar.pack(side=ttk.RIGHT, fill=ttk.Y)
 
